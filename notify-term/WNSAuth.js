@@ -67,6 +67,13 @@ class WNSAuth extends EventEmitter
 			var uuid = Rand.uuid();
 
 			_self.__send( ChannelUri, N, ( sender, e ) => {
+
+				if( typeof( e ) == "string" )
+				{
+					handler( _self, e );
+					return;
+				}
+
 				if( e.statusCode == 200 )
 				{
 					Model.Tokens.update(
@@ -83,11 +90,8 @@ class WNSAuth extends EventEmitter
 						}
 						handler( _self, uuid );
 					} );
-					return;
 				}
-
 				handler( _self, e.statusCode + " Server Error: Unable to push message to channel" );
-
 			} );
 		};
 
@@ -134,24 +138,32 @@ class WNSAuth extends EventEmitter
 			return;
 		}
 
-		var Request = new HttpRequest( ChannelUri, {
-			"Authorization":  "Bearer " + AuthToken
-			, "X-WNS-RequestForStatus": "true"
-			, "X-WNS-Type": "wns/toast"
-		} );
-
-		if( !Request.Hostname.match( /.*\.notify\.windows\.com$/ ) )
+		try
 		{
-			handler( this, "Malicious hostname: " + Request.Hostname );
+			var Request = new HttpRequest( ChannelUri, {
+				"Authorization":  "Bearer " + AuthToken
+				, "X-WNS-RequestForStatus": "true"
+				, "X-WNS-Type": "wns/toast"
+			} );
+
+			if( !Request.Hostname.match( /.*\.notify\.windows\.com$/ ) )
+			{
+				handler( this, "Malicious hostname: " + Request.Hostname );
+				return;
+			}
+
+			Request.PostData( NotisQ.Xml );
+			Request.Headers[ "Content-Type" ] = "text/xml";
+
+			Request.addListener( "RequestComplete", handler );
+
+			Request.Send();
+		}
+		catch( ex )
+		{
+			handler( this, ex.message );
 			return;
 		}
-
-		Request.PostData( NotisQ.Xml );
-		Request.Headers[ "Content-Type" ] = "text/xml";
-
-		Request.addListener( "RequestComplete", handler );
-
-		Request.Send();
 	}
 
 	__authWNS()

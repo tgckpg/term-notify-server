@@ -80,12 +80,13 @@ class App extends Base
 
 	ProcessQueue()
 	{
-		if( !this.RequestQueue.length ) return;
+		if(!( this.RequestQueue && this.RequestQueue.length ))
+		{
+			this.RequestQueue = [];
+			return;
+		}
 
 		var Request = this.RequestQueue.shift();
-
-		Dragonfly.Info( "Processing Request: " + Request );
-
 		this.OAuth.Deliver( Request );
 	}
 }
