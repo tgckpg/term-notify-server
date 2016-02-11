@@ -45,6 +45,23 @@ class App extends Base
 			case "deliver":
 				this.__sendMesg( query );
 				break;
+
+			case "remove":
+				this.OAuth.Unregister( query.id, ( err, data ) => {
+
+					if( err )
+					{
+						Dragonfly.Error( err );
+					}
+					else
+					{
+						Dragonfly.Debug( "Removed " + query.id + ": " + data );
+					}
+
+					_self.result = "OK";
+					_self.plantResult();
+				} );
+				break;
 			default:
 				this.result = "Invalid Action";
 				this.plantResult();

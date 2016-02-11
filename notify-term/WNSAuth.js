@@ -82,15 +82,21 @@ class WNSAuth extends EventEmitter
 						, { upsert: true }
 					)
 					.exec( ( err, data ) => {
+
 						if( err )
 						{
 							Dragonfly.Error( err );
 							handler( _self, "Server Error: Cannot save channel information" );
 							return;
 						}
+
+						// Success
 						handler( _self, uuid );
 					} );
+
+					return;
 				}
+
 				handler( _self, e.statusCode + " Server Error: Unable to push message to channel" );
 			} );
 		};
@@ -104,6 +110,17 @@ class WNSAuth extends EventEmitter
 		{
 			VerifyChannel();
 		}
+	}
+
+	Unregister( uuid, handler )
+	{
+		if( uuid == AuthTokenName )
+		{
+			handler( "Malicious action: Trying to remove AuthToken" );
+			return;
+		}
+
+		Model.Tokens.remove({ name: uuid }).exec( handler );
 	}
 
 	Deliver( NotisQ )
@@ -120,7 +137,7 @@ class WNSAuth extends EventEmitter
 			if( data && data.token )
 			{
 				this.__send( data.token, NotisQ, ( sender, e ) => {
-					Dragonfly.Debug( e.Data );
+					Dragonfly.Debug( "Send: " + e.statusCode );
 				} );
 			}
 			else
