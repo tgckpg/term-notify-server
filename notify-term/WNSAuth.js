@@ -185,7 +185,7 @@ class WNSAuth extends EventEmitter
 
 	__authWNS()
 	{
-		var serviceAuth = cl.load( "notifyterm.config.auth" );
+		var serviceAuth = cl.load( "notifyterm.config.auth", true );
 
 		var Request = new HttpRequest( serviceAuth.Uri );
 

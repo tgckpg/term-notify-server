@@ -1,0 +1,11 @@
+module.exports = {
+    // Defined in Docs
+	Uri: "https://login.live.com/accesstoken.srf"
+
+    // Given by Dev center
+	, Id: "ms-app://s-1-11-1-1111111111-1111111111-1111111111-1111111111-11111111-1111111111-1111111111"
+	, Secret: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+
+    // basic protection pass
+	, Client: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+}

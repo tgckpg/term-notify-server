@@ -1,0 +1,7 @@
+module.exports = {
+	host: "mongodb://123.456.789.0/database_name"
+	, auth:{
+		user: "UserName"
+		, pass: "Password"
+	}
+};

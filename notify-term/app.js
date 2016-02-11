@@ -9,6 +9,7 @@ var Base = cl.load( "notifysrv.postframe" );
 var WNSAuth = cl.load( "notifyterm.WNSAuth" );
 var Model = cl.load( "notifyterm.schema" );
 var NotisQ = cl.load( "notifyterm.Notis" );
+var SrvAuth = cl.load( "notifyterm.config.auth" );
 
 class App extends Base
 {
@@ -31,6 +32,20 @@ class App extends Base
 
 		var _self = this;
 		var query = e.Data;
+
+		// Protected Actions
+		switch( query.action )
+		{
+			case "register":
+			case "remove":
+				if(!( query.pass && query.pass == SrvAuth.Client ))
+				{
+					this.result = "Unauthorized Access";
+					this.plantResult();
+					return;
+				}
+				break;
+		}
 
 		switch( query.action )
 		{
