@@ -1,0 +1,20 @@
+{
+    "name": "notify-term"
+    , "exportName": "notify-term"
+    , "version": "0.0.1"
+    , "dependencies": {
+        "mongoose": "latest"
+    }
+    , "description": "The notify-term push notification server"
+    , "main": "index.js"
+    , "scripts": {
+    }
+    , "keywords": [
+        "notification"
+        , "terminal"
+        , "notifier"
+    ]
+    , "author": "Penguin <tgckpg@gmail.com>"
+    , "license": "MIT"
+    , "main": "index.js"
+}
