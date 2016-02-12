@@ -37,7 +37,7 @@ class WNSAuth extends EventEmitter
 		this.__inAuth = true;
 		var _self = this;
 
-		Model.Tokens.findOne({ name: AuthTokenName })
+		Model.Tokens.findOne({ name: AuthTokenName, date_created: { $gt: Date.now() - 83200 } })
 		.exec( ( err, data ) => {
 			if( err || !( data && data.token ) )
 			{
@@ -142,7 +142,7 @@ class WNSAuth extends EventEmitter
 		var _self = this;
 		Model.Tokens.update(
 			{ name: uuid }
-			, { name: uuid, token: ChannelUri }
+			, { name: uuid, token: ChannelUri, date_created: Date.now() }
 			, { upsert: true }
 		)
 		.exec( ( err, data ) => {
@@ -226,7 +226,7 @@ class WNSAuth extends EventEmitter
 			Model.Tokens
 				.update(
 					{ name: AuthTokenName }
-					, { name: AuthTokenName, token: AuthToken }
+					, { name: AuthTokenName, token: AuthToken, date_created: Date.now() }
 					, { upsert: true }
 				)
 				.exec( ( err, data ) => _self.__emitAuthComplete() );
