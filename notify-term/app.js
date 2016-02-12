@@ -16,7 +16,23 @@ class App extends Base
 	constructor( Http )
 	{
 		super( Http );
+
+		// Everything here is plain text
+		this.HTTP.response.headers[ "Content-Type" ] = "text/plain; charset=utf-8";
+
 		this.result = "Hello there! This is a notify-term server.\nFor more information please head to https://github.com/tgckpg/notify-term";
+
+		if( !this.HTTP.request.isPost )
+		{
+			if( this.HTTP.request.uri.path != "/" )
+			{
+				this.result = "This site has no static content";
+				this.HTTP.response.statusCode = 404;
+			}
+
+			this.plantResult();
+			return;
+		}
 
 		this.OAuth = new WNSAuth();
 		this.OAuth.addListener( "AuthComplete", this.OnAuthed.bind( this ) );
@@ -51,7 +67,7 @@ class App extends Base
 		{
 			case "register":
 				this.OAuth.Register(
-				query.uri, ( sender, mesg ) => {
+				query.id, query.uri, ( sender, mesg ) => {
 					_self.result = mesg;
 					_self.plantResult();
 				} );

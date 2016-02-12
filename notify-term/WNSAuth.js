@@ -53,7 +53,7 @@ class WNSAuth extends EventEmitter
 		} );
 	}
 
-	Register( ChannelUri, handler )
+	Register( uuid, ChannelUri, handler )
 	{
 		var _self = this;
 		var VerifyChannel = () =>
@@ -64,7 +64,14 @@ class WNSAuth extends EventEmitter
 				, message: "Registration success"
 			});
 
-			var uuid = Rand.uuid();
+			if( uuid )
+			{
+				Dragonfly.Info( "Renewal request: " + uuid );
+				this.__updateToken( uuid, ChannelUri, handler );
+				return;
+			}
+
+			uuid = Rand.uuid();
 
 			_self.__send( ChannelUri, N, ( sender, e ) => {
 
@@ -76,24 +83,7 @@ class WNSAuth extends EventEmitter
 
 				if( e.statusCode == 200 )
 				{
-					Model.Tokens.update(
-						{ name: uuid }
-						, { name: uuid, token: ChannelUri }
-						, { upsert: true }
-					)
-					.exec( ( err, data ) => {
-
-						if( err )
-						{
-							Dragonfly.Error( err );
-							handler( _self, "Server Error: Cannot save channel information" );
-							return;
-						}
-
-						// Success
-						handler( _self, uuid );
-					} );
-
+					this.__updateToken( uuid, ChannelUri, handler );
 					return;
 				}
 
@@ -144,6 +134,28 @@ class WNSAuth extends EventEmitter
 			{
 				Dragonfly.Info( "Channel not found: " + NotisQ.id );
 			}
+		} );
+	}
+
+	__updateToken( uuid, ChannelUri, handler )
+	{
+		var _self = this;
+		Model.Tokens.update(
+			{ name: uuid }
+			, { name: uuid, token: ChannelUri }
+			, { upsert: true }
+		)
+		.exec( ( err, data ) => {
+
+			if( err )
+			{
+				Dragonfly.Error( err );
+				handler( _self, "Server Error: Cannot save channel information" );
+				return;
+			}
+
+			// Success
+			handler( _self, uuid );
 		} );
 	}
 
