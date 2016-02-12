@@ -156,6 +156,7 @@ class WNSAuth extends EventEmitter
 
 			// Success
 			handler( _self, uuid );
+			Dragonfly.Info( "Register: " + uuid );
 		} );
 	}
 
