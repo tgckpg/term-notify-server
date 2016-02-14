@@ -115,6 +115,7 @@ class WNSAuth extends EventEmitter
 
 	Deliver( NotisQ )
 	{
+		var _self = this;
 		Model.Tokens
 		.findOne({ name: NotisQ.id })
 		.exec( ( err, data ) => {
@@ -128,6 +129,26 @@ class WNSAuth extends EventEmitter
 			{
 				this.__send( data.token, NotisQ, ( sender, e ) => {
 					Dragonfly.Debug( "Send: " + e.statusCode );
+
+					if( e.statusCode != 200 )
+					{
+						AuthToken = null;
+						Dragonfly.Info( "Perhaps access token is expired, retrying ..." );
+
+						if( NotisQ.Retry < 2 )
+						{
+							_self.once( "AuthComplete", () => {
+								NotisQ.Retry ++;
+								_self.Deliver( NotisQ );
+							});
+						}
+						else
+						{
+							Dragonfly.Info( "Retrying exceeded the limit, dropping the message" );
+						}
+
+						_self.Authenticate();
+					}
 				} );
 			}
 			else
