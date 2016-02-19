@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 require( "./botanss/package" );
 require( "./config/global" );
 
