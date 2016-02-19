@@ -12,6 +12,7 @@ class Notis
 	{
 		this.__valid = false;
 		this.__error = null;
+		this.Retry = 0;
 
 		try
 		{
