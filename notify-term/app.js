@@ -20,7 +20,7 @@ class App extends Base
 		// Everything here is plain text
 		this.HTTP.response.headers[ "Content-Type" ] = "text/plain; charset=utf-8";
 
-		this.result = "Hello there! This is a notify-term server.\nFor more information please head to https://github.com/tgckpg/notify-term";
+		this.result = "Hello there! This is a notify-term server.\nFor more information please head to https://github.com/tgckpg/term-notify";
 
 		if( !this.HTTP.request.isPost )
 		{
