@@ -47,7 +47,7 @@ else
 	Dragonfly = new Dragonfly();
 	global.Dragonfly = Dragonfly;
 
-	GLOBAL.X_SERVER_CLUSTER = cluster;
+	global.X_SERVER_CLUSTER = cluster;
 
 	var AppDomain = cl.load( "botanss.net.AppDomain" );
 	var Httph = cl.load( "botanss.net.Http" );
