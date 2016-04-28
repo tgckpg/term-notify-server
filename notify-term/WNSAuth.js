@@ -73,6 +73,8 @@ class WNSAuth extends EventEmitter
 
 			uuid = Rand.uuid();
 
+			Dragonfly.Debug( "ChannelUri: " + ChannelUri );
+
 			_self.__send( ChannelUri, N, ( sender, e ) => {
 
 				if( typeof( e ) == "string" )
@@ -87,6 +89,7 @@ class WNSAuth extends EventEmitter
 					return;
 				}
 
+				Dragonfly.Debug( e.statusCode + ": " + e.ResponseString );
 				handler( _self, e.statusCode + " Server Error: Unable to push message to channel" );
 			} );
 		};
@@ -245,6 +248,7 @@ class WNSAuth extends EventEmitter
 			AuthToken = JResponse.access_token;
 			Dragonfly.Info( "Authorization Success" );
 
+			Dragonfly.Debug( AuthTokenName + ": " + AuthToken );
 			Model.Tokens
 				.update(
 					{ name: AuthTokenName }
