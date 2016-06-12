@@ -53,7 +53,6 @@ else
 	var Httph = cl.load( "botanss.net.Http" );
 
 	//* Host App
-	var WebFrame = cl.load( "botanss.net.WebFrame" );
 
 	// Define AppNS
 	cl.rootNS( "notifyterm", "./notify-term" );
