@@ -6,7 +6,8 @@ var Dragonfly = global.Dragonfly;
 var EventEmitter = require( "events" ).EventEmitter;
 
 var HttpRequest = cl.load( "botanss.net.HttpRequest" );
-var Rand = cl.load( "notifysrv.utils.random" );
+var Rand = cl.load( "botansx.utils.random" );
+
 var Notis = cl.load( "notifyterm.Notis" );
 var Model = cl.load( "notifyterm.schema" );
 

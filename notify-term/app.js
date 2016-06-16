@@ -4,7 +4,7 @@ var cl = global.botanLoader;
 var Dragonfly = global.Dragonfly;
 
 var HttpRequest = cl.load( "botanss.net.HttpRequest" );
-var Base = cl.load( "notifysrv.postframe" );
+var Base = cl.load( "botanss.net.PostFrame" );
 
 var WNSAuth = cl.load( "notifyterm.WNSAuth" );
 var Model = cl.load( "notifyterm.schema" );

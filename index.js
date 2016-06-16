@@ -56,7 +56,7 @@ else
 
 	// Define AppNS
 	cl.rootNS( "notifyterm", "./notify-term" );
-	cl.rootNS( "notifysrv", "./notifysrv" );
+	cl.rootNS( "botansx", "./ext/" );
 
 	var App = cl.load( "notifyterm.app" );
 

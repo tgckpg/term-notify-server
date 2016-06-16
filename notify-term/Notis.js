@@ -4,7 +4,7 @@ var cl = global.botanLoader;
 var Dragonfly = global.Dragonfly;
 
 var HttpRequest = cl.load( "botanss.net.HttpRequest" );
-var ustr = cl.load( "notifysrv.utils.string" );
+var ustr = cl.load( "botansx.utils.string" );
 
 class Notis 
 {
