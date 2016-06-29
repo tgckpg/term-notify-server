@@ -25,6 +25,7 @@ var R_Tokens = { type: Schema.Types.ObjectId, ref: "Tokens" };
 var M_Tokens = new Schema({
 	name: { type: String, unique: true }
 	, token: { type: String }
+	, expired: { type: Boolean, default: false }
 	, date_created: {
 		type: Date
 		, default: Date.now
