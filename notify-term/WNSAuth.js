@@ -121,7 +121,7 @@ class WNSAuth extends EventEmitter
 	{
 		var _self = this;
 		Model.Tokens
-		.findOne({ name: NotisQ.id })
+		.findOne({ name: NotisQ.id, expired: false })
 		.exec( ( err, data ) => {
 			if( err )
 			{
@@ -134,24 +134,35 @@ class WNSAuth extends EventEmitter
 				this.__send( data.token, NotisQ, ( sender, e ) => {
 					Dragonfly.Debug( "Send: " + e.statusCode );
 
-					if( e.statusCode != 200 )
+					switch( e.statusCode )
 					{
-						AuthToken = null;
-						Dragonfly.Info( "Perhaps access token is expired, retrying ..." );
-
-						if( NotisQ.Retry < 2 )
-						{
-							_self.once( "AuthComplete", () => {
-								NotisQ.Retry ++;
-								_self.Deliver( NotisQ );
+						case 200: break;
+						case 410:
+							Dragonfly.Info( "Channel is expired: " + NotisQ.id  );
+							data.expired = true;
+							data.save( x => {
+								Dragonfly.Info( "Mark expired: " + NotisQ.id );
 							});
-						}
-						else
-						{
-							Dragonfly.Info( "Retrying exceeded the limit, dropping the message" );
-						}
 
-						_self.Authenticate();
+							break;
+
+						default:
+							AuthToken = null;
+							Dragonfly.Info( "Perhaps access token is expired, retrying ..." );
+
+							if( NotisQ.Retry < 2 )
+							{
+								_self.once( "AuthComplete", () => {
+									NotisQ.Retry ++;
+									_self.Deliver( NotisQ );
+								});
+							}
+							else
+							{
+								Dragonfly.Info( "Retrying exceeded the limit, dropping the message" );
+							}
+
+							_self.Authenticate();
 					}
 				} );
 			}
@@ -167,7 +178,12 @@ class WNSAuth extends EventEmitter
 		var _self = this;
 		Model.Tokens.update(
 			{ name: uuid }
-			, { name: uuid, token: ChannelUri, date_created: Date.now() }
+			, {
+				name: uuid
+				, token: ChannelUri
+				, date_created: Date.now()
+				, expired: false
+			}
 			, { upsert: true }
 		)
 		.exec( ( err, data ) => {
@@ -256,7 +272,10 @@ class WNSAuth extends EventEmitter
 					, { name: AuthTokenName, token: AuthToken, date_created: Date.now() }
 					, { upsert: true }
 				)
-				.exec( ( err, data ) => _self.__emitAuthComplete() );
+				.exec( ( err, data ) => {
+					if( err ) Dragonfly.Error( err );
+					_self.__emitAuthComplete();
+				});
 		}
 		else
 		{

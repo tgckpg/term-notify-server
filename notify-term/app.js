@@ -7,7 +7,6 @@ var HttpRequest = cl.load( "botanss.net.HttpRequest" );
 var Base = cl.load( "botanss.net.PostFrame" );
 
 var WNSAuth = cl.load( "notifyterm.WNSAuth" );
-var Model = cl.load( "notifyterm.schema" );
 var NotisQ = cl.load( "notifyterm.Notis" );
 var SrvAuth = cl.load( "notifyterm.config.auth" );
 
