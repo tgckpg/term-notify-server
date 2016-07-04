@@ -45,7 +45,6 @@ class App extends Base
 	{
 		e.Handled = true;
 
-		var _self = this;
 		var query = e.Data;
 
 		// Protected Actions
@@ -55,8 +54,11 @@ class App extends Base
 			case "remove":
 				if(!( query.pass && query.pass == SrvAuth.Client ))
 				{
+					Dragonfly.Debug( "Unauthorized Access" );
+
 					this.result = "Unauthorized Access";
 					this.plantResult();
+
 					return;
 				}
 				break;
@@ -65,10 +67,11 @@ class App extends Base
 		switch( query.action )
 		{
 			case "register":
+				console.log( "HEiiiiRE" );
 				this.OAuth.Register(
 				query.id, query.uri, ( sender, mesg ) => {
-					_self.result = mesg;
-					_self.plantResult();
+					this.result = mesg;
+					this.plantResult();
 				} );
 				break;
 
@@ -88,8 +91,8 @@ class App extends Base
 						Dragonfly.Debug( "Removed " + query.id + ": " + data );
 					}
 
-					_self.result = "OK";
-					_self.plantResult();
+					this.result = "OK";
+					this.plantResult();
 				} );
 				break;
 			default:
