@@ -36,35 +36,29 @@ class WNSAuth extends EventEmitter
 		if( this.__inAuth ) return;
 
 		this.__inAuth = true;
-		var _self = this;
 
 		Model.Tokens.findOne({ name: AuthTokenName, date_created: { $gt: Date.now() - 83200 } })
 		.exec( ( err, data ) => {
 			if( err || !( data && data.token ) )
 			{
 				Dragonfly.Info( "Database does not contain access token, authenticating" );
-				_self.__authWNS();
+				this.__authWNS();
 			}
 			else
 			{
 				Dragonfly.Info( "Access token found in database, using it" );
 				AuthToken = data.token;
-				_self.__emitAuthComplete();
+				this.__emitAuthComplete();
 			}
 		} );
 	}
 
-	Register( uuid, ChannelUri, handler )
+	Register( uuid, ChannelUri, handler, retry )
 	{
-		var _self = this;
+		if( retry == undefined ) retry = 0;
+
 		var VerifyChannel = () =>
 		{
-			var N = new Notis({
-				id: "Null"
-				, title: "Channel Registration"
-				, message: "Registration success"
-			});
-
 			if( uuid )
 			{
 				Dragonfly.Info( "Renewal request: " + uuid );
@@ -72,26 +66,47 @@ class WNSAuth extends EventEmitter
 				return;
 			}
 
-			uuid = Rand.uuid();
-
 			Dragonfly.Debug( "ChannelUri: " + ChannelUri );
 
-			_self.__send( ChannelUri, N, ( sender, e ) => {
+			var N = new Notis({
+				id: "Null"
+				, title: "Channel Registration"
+				, message: "Registration success"
+			});
+
+			this.__send( ChannelUri, N, ( sender, e ) => {
 
 				if( typeof( e ) == "string" )
 				{
-					handler( _self, e );
+					handler( this, e );
 					return;
 				}
 
-				if( e.statusCode == 200 )
+				switch( e.statusCode )
 				{
-					this.__updateToken( uuid, ChannelUri, handler );
-					return;
+					case 200:
+						this.__updateToken( uuid || Rand.uuid(), ChannelUri, handler );
+						break;
+
+					default:
+						AuthToken = null;
+						Dragonfly.Info( "Perhaps access token is expired, retrying ..." );
+
+						if( retry < 2 )
+						{
+							this.once( "AuthComplete", () => {
+								this.Regster( uuid, ChannelUri, handler, retry + 1 );
+							});
+						}
+						else
+						{
+							Dragonfly.Debug( "WNSResponse: " + e.statusCode );
+							handler( this, e.statusCode + " Server Error: Unable to push message to channel" );
+						}
+
+						this.Authenticate();
 				}
 
-				Dragonfly.Debug( e.statusCode + ": " + e.ResponseString );
-				handler( _self, e.statusCode + " Server Error: Unable to push message to channel" );
 			} );
 		};
 
@@ -119,7 +134,6 @@ class WNSAuth extends EventEmitter
 
 	Deliver( NotisQ )
 	{
-		var _self = this;
 		Model.Tokens
 		.findOne({ name: NotisQ.id, expired: false })
 		.exec( ( err, data ) => {
@@ -152,9 +166,9 @@ class WNSAuth extends EventEmitter
 
 							if( NotisQ.Retry < 2 )
 							{
-								_self.once( "AuthComplete", () => {
+								this.once( "AuthComplete", () => {
 									NotisQ.Retry ++;
-									_self.Deliver( NotisQ );
+									this.Deliver( NotisQ );
 								});
 							}
 							else
@@ -162,7 +176,7 @@ class WNSAuth extends EventEmitter
 								Dragonfly.Info( "Retrying exceeded the limit, dropping the message" );
 							}
 
-							_self.Authenticate();
+							this.Authenticate();
 					}
 				} );
 			}
@@ -175,7 +189,6 @@ class WNSAuth extends EventEmitter
 
 	__updateToken( uuid, ChannelUri, handler )
 	{
-		var _self = this;
 		Model.Tokens.update(
 			{ name: uuid }
 			, {
@@ -191,12 +204,12 @@ class WNSAuth extends EventEmitter
 			if( err )
 			{
 				Dragonfly.Error( err );
-				handler( _self, "Server Error: Cannot save channel information" );
+				handler( this, "Server Error: Cannot save channel information" );
 				return;
 			}
 
 			// Success
-			handler( _self, uuid );
+			handler( this, uuid );
 			Dragonfly.Info( "Register: " + uuid );
 		} );
 	}
@@ -257,7 +270,6 @@ class WNSAuth extends EventEmitter
 
 	__requestComplete( sender, e )
 	{
-		var _self = this;
 		let JResponse = JSON.parse( e.ResponseString );
 
 		if( JResponse && JResponse.access_token )
@@ -274,13 +286,13 @@ class WNSAuth extends EventEmitter
 				)
 				.exec( ( err, data ) => {
 					if( err ) Dragonfly.Error( err );
-					_self.__emitAuthComplete();
+					this.__emitAuthComplete();
 				});
 		}
 		else
 		{
 			Dragonfly.Error( "Unable to authenticate: " + e.ResponseString );
-			_self.__emitAuthComplete();
+			this.__emitAuthComplete();
 		}
 	}
 

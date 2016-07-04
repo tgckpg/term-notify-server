@@ -1,6 +1,6 @@
 [submodule "botanss"]
 	path = botanss
-	url = git@github.com:tgckpg/BotanSS.git
+	url = https://github.com/tgckpg/BotanSS.git
 [submodule "ext/utils"]
 	path = ext/utils
-	url = git@github.com:tgckpg/botansx-utils.git
+	url = https://github.com/tgckpg/botansx-utils.git
