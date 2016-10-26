@@ -26,7 +26,7 @@ if( cluster.isMaster )
 
 	var clusterDisconnect = function( worker )
 	{
-		if( worker.suicide === true )
+		if( worker.exitedAfterDisconnect === true )
 		{
 			Masterfly.Info( "Worker committed suicide" );
 			Masterfly.Info( "Forking process ..." );
