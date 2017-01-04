@@ -67,7 +67,6 @@ class App extends Base
 		switch( query.action )
 		{
 			case "register":
-				console.log( "HEiiiiRE" );
 				this.OAuth.Register(
 				query.id, query.uri, ( sender, mesg ) => {
 					this.result = mesg;
