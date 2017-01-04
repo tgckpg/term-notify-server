@@ -95,7 +95,7 @@ class WNSAuth extends EventEmitter
 						if( retry < 2 )
 						{
 							this.once( "AuthComplete", () => {
-								this.Regster( uuid, ChannelUri, handler, retry + 1 );
+								this.Register( uuid, ChannelUri, handler, retry + 1 );
 							});
 						}
 						else
